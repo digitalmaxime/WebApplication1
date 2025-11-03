@@ -1,0 +1,73 @@
+# Name of your workflow.
+name: Build and Deploy ASP.NET Core App
+
+# Controls when the workflow will run.
+on:
+  # Allows you to run this workflow manually from the Actions tab on GitHub.
+  workflow_dispatch:
+  # Triggers the workflow on push events but only for the "main" branch.
+  push:
+    branches: [ "main" ]
+
+# A set of environment variables that are available to all jobs and steps in the workflow.
+env:
+  AZURE_WEBAPP_NAME: 'TestWeatherApp' # <-- 1. SET YOUR AZURE WEB APP NAME
+  PROJECT_PATH: 'WebApplication1/WebApplication1.csproj' # <-- 2. SET THE PATH TO YOUR .csproj FILE
+  DOTNET_VERSION: '8.0.x' # The .NET version to use.
+
+jobs:
+  build:
+    # The type of runner that the job will run on.
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      # Sets up a specific version of the .NET SDK.
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      
+      # Restores the dependencies and tools of a project.
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+      
+      # Builds a project and all of its dependencies.
+      - name: Build project
+        run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+      
+      # Publishes the application and its dependencies to a folder for deployment.
+      - name: Publish project
+        run: dotnet publish ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ./publish
+      
+      # Uploads the published folder as an artifact to be used in the deploy job.
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-app
+          path: ./publish
+
+  deploy:
+    # The deploy job will only run if the build job has completed successfully.
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      # Downloads the artifact that was uploaded in the build job.
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dotnet-app
+          path: ./publish
+      
+      # Deploys the application to Azure Web Apps.
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          # This secret contains the XML content of the publish profile.
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: './publish'

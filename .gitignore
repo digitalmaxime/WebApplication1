@@ -1,0 +1,76 @@
+# .gitignore for ASP.NET Core projects
+
+## General
+# Ignore all files and directories starting with a dot, which are typically hidden system files.
+# We will explicitly un-ignore specific ones like .gitattributes and .github.
+.*
+!.gitignore
+!.gitattributes
+!.github/
+
+## Build Artifacts
+# These directories are generated during the build process and contain compiled code and intermediate files.
+[Bb]in/
+[Oo]bj/
+publish/
+
+## IDE and Editor specific files
+# Visual Studio
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+
+# Visual Studio Code
+.vscode/*
+!/.vscode/settings.json
+!/.vscode/tasks.json
+!/.vscode/launch.json
+!/.vscode/extensions.json
+*.code-workspace
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+## Sensitive Configuration
+# User Secrets file - this is critical to ignore.
+**/secrets.json
+**/usersecrets.id
+
+# Local development settings often contain connection strings or API keys.
+# It's a best practice to keep these out of source control.
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json
+!appsettings.Production.json
+
+## Runtime and Tools
+# NuGet packages folder
+[Pp]ackages/
+*.nupkg
+
+# Test results and coverage reports
+[Tt]est[Rr]esult*/
+[Cc]overage*/
+*.trx
+
+# Log files
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+## Operating System files
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
