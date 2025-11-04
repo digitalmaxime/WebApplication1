@@ -26,6 +26,39 @@ todosApi.MapGet("/{id}", (int id) =>
         ? Results.Ok(todo)
         : Results.NotFound());
 
+app.MapGet("/", () =>
+{
+    // Using Results.Content allows us to specify the content type as 'text/html'.
+    // This creates a more helpful landing page for developers exploring your API.
+    var html = """
+                   <!DOCTYPE html>
+                   <html lang="en">
+                   <head>
+                       <meta charset="UTF-8">
+                       <title>Todo API</title>
+                       <style>
+                           body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: 2em; color: #333; }
+                           h1 { color: #000; }
+                           a { text-decoration: none; color: #007bff; }
+                           a:hover { text-decoration: underline; }
+                           code { background-color: #f2f2f2; padding: 2px 6px; border-radius: 4px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+                       </style>
+                   </head>
+                   <body>
+                       <h1>Welcome to the Todo API</h1>
+                       <p>This is a sample minimal API for managing a list of todos.</p>
+                       <p>
+                           You can interact with the API at the <code>/todos</code> endpoint.
+                           <br>
+                           Try it now: <a href="/todos">/todos</a>
+                       </p>
+                   </body>
+                   </html>
+               """;
+    return Results.Content(html, "text/html");
+});
+
+
 app.Run();
 
 public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplete = false);
